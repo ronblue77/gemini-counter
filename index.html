@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Capsule Visitor Counter</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .container {
+            background: #000;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        h1 {
+            color: #00ff00;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            font-size: 1.8em;
+        }
+        
+        .counter-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #00ffff;
+            background: #000;
+            border: 1px solid #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+            letter-spacing: 3px;
+        }
+        
+        .info {
+            margin-top: 20px;
+            color: #cccccc;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .gemini-link {
+            color: #00ff00;
+            text-decoration: none;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 15px;
+            display: inline-block;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .gemini-link:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .stats {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #888;
+        }
+        
+        .terminal-style {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Gemini Capsule Visitor Counter</h1>
+        
+        <div class="counter-display" id="counter">
+            Loading...
+        </div>
+        
+        <div class="info">
+            <p><strong>This counter tracks visitors to:</strong></p>
+            <div class="terminal-style">
+                gemini://kolhaam.flounder.online/
+            </div>
+        </div>
+        
+        <a href="gemini://kolhaam.flounder.online/" class="gemini-link">
+            🌐 Visit Gemini Capsule
+        </a>
+        
+        <div class="stats">
+            <p>Counter started: <span id="startDate">June 27, 2025</span></p>
+            <p>Last updated: <span id="lastUpdate">--</span></p>
+            <p>Unique visitors today: <span id="todayCount">--</span></p>
+        </div>
+        
+        <div class="info">
+            <p style="font-size: 0.7em; color: #666;">
+                This counter uses localStorage to track visits.<br>
+                Data is stored locally in your browser.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Simple visitor counter using localStorage
+        const COUNTER_KEY = 'gemini_capsule_visits';
+        const TODAY_KEY = 'gemini_capsule_today';
+        const START_DATE_KEY = 'gemini_capsule_start';
+        const LAST_VISIT_KEY = 'gemini_capsule_last_visit';
+        
+        function initCounter() {
+            // Get or initialize total counter
+            let totalVisits = parseInt(localStorage.getItem(COUNTER_KEY) || '0');
+            
+            // Check if this is a new visitor (hasn't visited in the last hour)
+            const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
+            const now = new Date().getTime();
+            const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+            
+            if (!lastVisit || (now - parseInt(lastVisit)) > oneHour) {
+                totalVisits++;
+                localStorage.setItem(COUNTER_KEY, totalVisits.toString());
+                localStorage.setItem(LAST_VISIT_KEY, now.toString());
+            }
+            
+            // Handle daily counter
+            const today = new Date().toDateString();
+            const storedDate = localStorage.getItem('counter_date');
+            let todayVisits = parseInt(localStorage.getItem(TODAY_KEY) || '0');
+            
+            if (storedDate !== today) {
+                // New day, reset today counter
+                todayVisits = 1;
+                localStorage.setItem('counter_date', today);
+                localStorage.setItem(TODAY_KEY, '1');
+            } else if (!lastVisit || (now - parseInt(lastVisit)) > oneHour) {
+                // Same day, but new visitor
+                todayVisits++;
+                localStorage.setItem(TODAY_KEY, todayVisits.toString());
+            }
+            
+            // Set start date if not exists
+            if (!localStorage.getItem(START_DATE_KEY)) {
+                localStorage.setItem(START_DATE_KEY, new Date().toDateString());
+            }
+            
+            return {
+                total: totalVisits,
+                today: todayVisits,
+                startDate: localStorage.getItem(START_DATE_KEY)
+            };
+        }
+        
+        function updateDisplay() {
+            const stats = initCounter();
+            
+            // Update counter display with animation
+            const counterEl = document.getElementById('counter');
+            counterEl.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                counterEl.textContent = stats.total.toLocaleString();
+                counterEl.style.transform = 'scale(1)';
+            }, 200);
+            
+            // Update other stats
+            document.getElementById('todayCount').textContent = stats.today;
+            document.getElementById('startDate').textContent = stats.startDate;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDisplay();
+            
+            // Add some visual effects
+            setTimeout(() => {
+                document.querySelector('.container').style.opacity = '1';
+                document.querySelector('.container').style.transform = 'translateY(0)';
+            }, 100);
+        });
+        
+        // Update counter every 30 seconds
+        setInterval(updateDisplay, 30000);
+        
+        // Add CSS animation
+        document.querySelector('.container').style.opacity = '0';
+        document.querySelector('.container').style.transform = 'translateY(20px)';
+        document.querySelector('.container').style.transition = 'all 0.5s ease';
+    </script>
+</body>
+</html>
