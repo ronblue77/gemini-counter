@@ -67,14 +67,19 @@
             50% { transform: scale(1.05); }
         }
         
-        .loading {
-            color: #ffff00;
-            animation: blink 1s infinite;
+        .counter-image {
+            background: #000;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #00ff41;
+            margin: 20px 0;
         }
         
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
+        .counter-image img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
         
         .info {
@@ -127,44 +132,42 @@
             font-size: 0.9em;
         }
         
-        .status {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #00ff41;
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: 1px solid #00ff41;
-            font-size: 0.8em;
-        }
-        
-        .error {
-            color: #ff4444;
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid #ff4444;
+        .note {
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid #ffff00;
+            color: #ffff00;
             padding: 15px;
             border-radius: 8px;
             margin: 20px 0;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-    <div class="status" id="status">🔄 Loading...</div>
-    
     <div class="container">
         <h1>🚀 Gemini Capsule Visitor Counter</h1>
         
-        <div class="counter-display" id="counter">
-            <span class="loading">Loading...</span>
-        </div>
-        
         <div class="info">
-            <p><strong>This counter tracks every visit to:</strong></p>
+            <p><strong>Live Counter for:</strong></p>
             <div class="terminal-style">
                 gemini://kolhaam.flounder.online/
             </div>
-            <p>✨ <strong>Simple & Real:</strong> Increments on every page load, refresh, or visit!</p>
+        </div>
+        
+        <!-- HitWebCounter - Increments on every page load -->
+        <div class="counter-image">
+            <img src="https://hitwebcounter.com/counter/counter.php?page=kolhaam-gemini&style=0025&nbdigits=6&type=page&initCount=0" 
+                 alt="Visitor Counter" 
+                 title="Total Visits"
+                 onload="showSuccess()"
+                 onerror="showError()">
+        </div>
+        
+        <div class="note">
+            <p><strong>🔥 This counter increments on EVERY visit!</strong></p>
+            <p>✅ Refreshing this page = +1<br>
+               ✅ Visiting from different devices = +1<br>
+               ✅ Any browser, any time = +1</p>
         </div>
         
         <a href="gemini://kolhaam.flounder.online/" class="gemini-link">
@@ -172,104 +175,55 @@
         </a>
         
         <div class="stats">
-            <p><strong>Counter Statistics:</strong></p>
-            <p>🔄 Updates: Real-time on every visit</p>
-            <p>🌍 Tracking: All visitors, all devices</p>
-            <p>⚡ Method: External API counter</p>
-            <p>🔒 Privacy: No personal data stored</p>
+            <p><strong>How it works:</strong></p>
+            <p>🔄 Image-based counter from HitWebCounter.com</p>
+            <p>📊 Counts every single page load</p>
+            <p>🌍 Works from any device or browser</p>
+            <p>⚡ No JavaScript required - pure HTTP requests</p>
+            <p>🆓 Completely free service</p>
         </div>
         
-        <div id="errorDisplay" style="display: none;" class="error">
-            <p><strong>⚠️ Counter service unavailable</strong></p>
-            <p>Showing fallback counter. The number below increments locally for demonstration.</p>
+        <!-- Backup counter displays -->
+        <div id="backup-counters" style="display: none;">
+            <h3>Alternative Counters:</h3>
+            
+            <p><strong>Style 1 (Digital):</strong></p>
+            <img src="https://hitwebcounter.com/counter/counter.php?page=kolhaam-backup1&style=0001&nbdigits=5&type=page&initCount=0" alt="Counter 1">
+            
+            <p><strong>Style 2 (Simple):</strong></p>
+            <img src="https://hitwebcounter.com/counter/counter.php?page=kolhaam-backup2&style=0010&nbdigits=5&type=page&initCount=0" alt="Counter 2">
+            
+            <p><strong>Style 3 (Colorful):</strong></p>
+            <img src="https://hitwebcounter.com/counter/counter.php?page=kolhaam-backup3&style=0020&nbdigits=5&type=page&initCount=0" alt="Counter 3">
+        </div>
+        
+        <button onclick="document.getElementById('backup-counters').style.display = document.getElementById('backup-counters').style.display === 'none' ? 'block' : 'none'" 
+                style="background: #00ff41; color: #000; border: none; padding: 10px 20px; margin: 10px; border-radius: 5px; cursor: pointer; font-family: 'Courier New', monospace;">
+            Show Alternative Counter Styles
+        </button>
+        
+        <div class="stats">
+            <p><strong>🧪 Test Instructions:</strong></p>
+            <p>1. Note the current number in the counter above</p>
+            <p>2. Refresh this page (F5 or reload button)</p>
+            <p>3. The number should increase by 1</p>
+            <p>4. Try opening this page in a new tab - it should increase again</p>
+            <p>5. Visit from your phone - it should increase again</p>
         </div>
     </div>
 
     <script>
-        let fallbackCounter = 1;
-        const COUNTER_ID = 'gemini-capsule-' + Math.random().toString(36).substr(2, 9);
-        
-        // Update status display
-        function updateStatus(message, color = '#00ff41') {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.style.color = color;
+        function showSuccess() {
+            console.log('Counter loaded successfully!');
         }
         
-        // Try multiple counter services
-        async function incrementCounter() {
-            updateStatus('🔄 Incrementing counter...');
-            
-            // Method 1: CountAPI (free, no registration)
-            try {
-                const response = await fetch(`https://api.countapi.xyz/hit/gemini-capsule/visits`);
-                if (response.ok) {
-                    const data = await response.json();
-                    displayCounter(data.value);
-                    updateStatus('✅ Counter updated', '#00ff41');
-                    return;
-                }
-            } catch (error) {
-                console.log('CountAPI failed:', error);
-            }
-            
-            // Method 2: Simple Counter API
-            try {
-                const response = await fetch('https://visitor.6developer.com/visit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        domain: 'gemini-capsule-counter',
-                        timezone: 'UTC',
-                        page_path: '/counter',
-                        page_title: 'Gemini Counter'
-                    })
-                });
-                
-                if (response.ok) {
-                    // Get current count
-                    const countResponse = await fetch('https://visitor.6developer.com/stats/gemini-capsule-counter');
-                    if (countResponse.ok) {
-                        const count = await countResponse.text();
-                        displayCounter(parseInt(count) || fallbackCounter);
-                        updateStatus('✅ Counter updated', '#00ff41');
-                        return;
-                    }
-                }
-            } catch (error) {
-                console.log('6developer API failed:', error);
-            }
-            
-            // Fallback: Use a simple incrementing number
-            fallbackCounter++;
-            displayCounter(fallbackCounter);
-            updateStatus('⚠️ Using fallback counter', '#ffaa00');
-            document.getElementById('errorDisplay').style.display = 'block';
+        function showError() {
+            console.log('Counter image failed to load');
+            // You could add fallback logic here if needed
         }
         
-        function displayCounter(count) {
-            const counterEl = document.getElementById('counter');
-            
-            // Animation effect
-            counterEl.style.transform = 'scale(0.8)';
-            counterEl.style.opacity = '0.5';
-            
-            setTimeout(() => {
-                counterEl.innerHTML = count.toLocaleString();
-                counterEl.style.transform = 'scale(1)';
-                counterEl.style.opacity = '1';
-                counterEl.style.transition = 'all 0.5s ease';
-            }, 300);
-        }
-        
-        // Initialize counter when page loads
+        // Add entrance animation
         document.addEventListener('DOMContentLoaded', function() {
-            // Small delay for visual effect
-            setTimeout(() => {
-                incrementCounter();
-            }, 500);
-            
-            // Add entrance animation
             document.querySelector('.container').style.opacity = '0';
             document.querySelector('.container').style.transform = 'translateY(30px)';
             document.querySelector('.container').style.transition = 'all 0.8s ease';
@@ -279,13 +233,6 @@
                 document.querySelector('.container').style.transform = 'translateY(0)';
             }, 200);
         });
-        
-        // Optional: Update counter every 30 seconds for real-time feel
-        setInterval(() => {
-            if (document.visibilityState === 'visible') {
-                incrementCounter();
-            }
-        }, 30000);
     </script>
 </body>
 </html>
